@@ -1,0 +1,40 @@
+# Hermes VPS Defender — déploiement SIMPLE & SÛR (plain docker compose sur l'hôte)
+#
+# - Image tirée de GHCR (buildée par .github/workflows/ghcr-image.yml)
+# - Sur le bridge `whatsapp-shared-network` : même réseau que gowa -> DNS interne
+# - AUCUN port publié, AUCUN accès Internet entrant. Admin = tunnel SSH.
+# - Secrets dans .env (jamais dans l'image ni le repo)
+#
+# Déploiement :
+#   cp .env.example .env && nano .env     # clés + GOWA_URL + WA_RECIPIENT
+#   docker login ghcr.io                  # si le package GHCR est privé
+#   docker compose up -d
+#   docker compose logs -f
+
+services:
+  hermes-defender:
+    image: ghcr.io/shalom-302/hermes-defender:main   # buildée par .github/workflows/ghcr-image.yml
+    container_name: hermes-defender
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      HERMES_HOME: /opt/data
+      HERMES_UID: ${HERMES_UID:-10000}
+      HERMES_GID: ${HERMES_GID:-10000}
+      # Dashboard/API gateway : NON exposés. On ne met PAS API_SERVER_HOST=0.0.0.0.
+    volumes:
+      - hermes-data:/opt/data                                             # état Hermes (persistant)
+      - ./skills/vps-defender:/opt/data/skills/vps-defender:ro
+      - ./scripts:/opt/defender/scripts:ro
+      - ./allowlist.txt:/opt/defender/allowlist.txt:ro
+      - /var/log:/host/var/log:ro                                         # logs VPS en lecture seule
+    # Pas de `ports:` -> rien n'écoute sur l'IP publique.
+    networks:
+      - whatsapp-shared-network    # gowa (shalom-gowa) y est déjà -> joignable via http://shalom-gowa:3080
+
+volumes:
+  hermes-data:
+
+networks:
+  whatsapp-shared-network:
+    external: true

@@ -1,0 +1,10 @@
+# Cibles AUTORISÉES pour les audits (une par ligne, domaine ou IP).
+# Le script authorized-audit.sh REFUSE toute cible absente de ce fichier.
+# N'ajoute QUE des cibles que tu possèdes ou pour lesquelles tu as une
+# autorisation écrite. Les lignes vides et les lignes commençant par # sont ignorées.
+#
+# Exemples (à remplacer par les tiennes) :
+# mon-domaine.com
+# 203.0.113.10
+kaanari.com
+167.235.234.164

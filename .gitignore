@@ -1,0 +1,8 @@
+# Secrets — ne JAMAIS committer
+.env
+*.env
+!.env.example
+
+# Rapports d'audit locaux
+audit_*.nmap
+audit_*.nuclei

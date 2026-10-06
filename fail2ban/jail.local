@@ -1,0 +1,29 @@
+# /etc/fail2ban/jail.local — blocage auto des scanners + notif WhatsApp.
+# Le blocage réel est fait par fail2ban (banaction nftables) sur l'hôte.
+# La ligne `action = ... whatsapp` ajoute la notification.
+
+[DEFAULT]
+bantime  = 1h
+findtime = 10m
+maxretry = 5
+banaction = nftables-multiport
+# notifie WhatsApp EN PLUS du blocage :
+action = %(banaction)s[name=%(__name__)s, port="%(port)s", protocol="%(protocol)s"]
+         whatsapp[name=%(__name__)s]
+
+[sshd]
+enabled = true
+
+[nginx-http-auth]
+enabled = true
+
+[nginx-botsearch]
+# détecte les scanners qui cherchent des URLs sensibles (.env, /admin, etc.)
+enabled = true
+
+# "recidive" : banni longtemps ceux qui se font bannir de façon répétée.
+[recidive]
+enabled  = true
+bantime  = 1w
+findtime = 1d
+maxretry = 3
